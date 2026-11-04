@@ -30,4 +30,18 @@ class ReservaError(SoftwareFJError):
 class OperacionNoPermitidaError(SoftwareFJError):
     pass
 
-  
+  # 3 CLASE ABSTRACTA ENTIDAD
+
+class Entidad(ABC):
+
+    def __init__(self, identificador):
+        if not identificador:
+            raise DatosInvalidosError(
+                "El identificador es obligatorio."
+            )
+
+        self.identificador = identificador
+
+    @abstractmethod
+    def validar(self):
+        pass
