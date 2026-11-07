@@ -7,13 +7,12 @@ logging.basicConfig(
     filename="software_fj.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
-    encoding="utf-8"
+    encoding="utf-8")
 
-  # 2 EXCEPCIONES PERSONALIZADAS
+# 2 EXCEPCIONES PERSONALIZADAS
 
-  class SoftwareFJError(Exception):
+class SoftwareFJError(Exception):
     pass
-
 
 class DatosInvalidosError(SoftwareFJError):
     pass

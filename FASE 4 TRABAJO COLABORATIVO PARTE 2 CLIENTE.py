@@ -78,8 +78,9 @@ def main() -> None:
 
     # 12. Eliminación con reservas (no permitida)
     titulo("12. Eliminación no permitida: cliente con reservas")
-    if c1:
-        c1.agregar_reserva(1)
+    cliente = gestor.buscar("1075123456")
+    if cliente:
+        cliente.agregar_reserva(1)
     print("OK" if gestor.eliminar("1075123456") else "FALLÓ (registrado en log)")
 
     titulo("Clientes finales en memoria")
