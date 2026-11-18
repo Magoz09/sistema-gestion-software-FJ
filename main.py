@@ -39,13 +39,17 @@ class OperacionNoPermitidaError(SoftwareFJError):
 class Entidad(ABC):
 
     def __init__(self, identificador):
-        if not identificador:
-            raise DatosInvalidosError(
-                "El identificador es obligatorio."
-            )
-
-        self.identificador = identificador
+        if not isinstance (identificador,str) or not identificador. strip():
+             raise DatosInvalidosError("El identificador es obligatorio.")
+        self._identificador = identificador.strip()
+           
+    @property
+    def identificador(self):
+        return self._identificador
 
     @abstractmethod
     def validar(self):
         pass
+      
+
+   
