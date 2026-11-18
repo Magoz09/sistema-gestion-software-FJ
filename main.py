@@ -1,33 +1,38 @@
 from abc import ABC, abstractmethod
 import logging
+import re
 
-# 1 CONFIGURACION DEL ARCHIVO DE LOGS
+# 1 CONFIGURACION DEL REGISTRO DE EVENTOS (LOGS)
+
+ARCHIVO_LOG = "software_fj.log"
 
 logging.basicConfig(
-    filename="software_fj.log",
+    filename = ARCHIVO_log,
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
     encoding="utf-8")
 
+log = logging.getLogger("SoftwareFJ")
+
 # 2 EXCEPCIONES PERSONALIZADAS
 
 class SoftwareFJError(Exception):
-    pass
+     """Excepción base del sistema."""
 
 class DatosInvalidosError(SoftwareFJError):
-    pass
+    """Se utiliza cuando los datos ingresados no son válidos."""
 
 
 class ServicioNoDisponibleError(SoftwareFJError):
-    pass
+    """Se utiliza cuando un servicio no está disponible."""
 
 
 class ReservaError(SoftwareFJError):
-    pass
+    """Se utiliza cuando ocurre un problema con una reserva."""
 
 
 class OperacionNoPermitidaError(SoftwareFJError):
-    pass
+    """Se utiliza cuando una operación no está permitida."""
 
   # 3 CLASE ABSTRACTA ENTIDAD
 
