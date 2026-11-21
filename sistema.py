@@ -1,102 +1,65 @@
-# sistema.py
-# Punto 5: integración inicial de Software FJ.
-# Coordina las operaciones usando los módulos existentes del proyecto.
-
-from gestor_clientes import GestorClientes
-from logger import log
-
-
 class Sistema:
     def __init__(self):
         self.gestor_clientes = GestorClientes()
+        self.gestor_reservas = GestorReservas()
+        self.servicios = {}
+        self._cargar_servicios_iniciales()
+        log.info("Sistema Software FJ iniciado.")
 
-        # Integración provisional: se conectarán las clases reales
-        # cuando se conozcan las interfaces de servicios.py y reservas.py.
-        self.servicios = []
-        self.reservas = []
+    def _cargar_servicios_iniciales(self):
+        servicios_iniciales = [
+            ReservaSalas("S001", 3, 50000),
+            AlquilerEquipos("E001", "Computador", 2, 30000),
+            ConsultoriaEspecializada("C001", "Sistemas", 4, 40000)
+        ]
+        for servicio in servicios_iniciales:
+            self.servicios[servicio.identificador] = servicio
 
-        log.info("Sistema Software FJ iniciado")
-
-    def registrar_cliente(self, **datos):
-        try:
-            resultado = self.gestor_clientes.registrar(**datos)
-
-            if resultado:
-                log.info("Cliente registrado correctamente")
-            else:
-                log.warning("No se pudo registrar el cliente")
-
-            return resultado
-
-        except Exception:
-            log.exception("Error al registrar cliente")
-            raise
+    def registrar_cliente(self, *args, **kwargs):
+        return self.gestor_clientes.registrar(*args, **kwargs)
 
     def buscar_cliente(self, documento):
-        cliente = self.gestor_clientes.buscar(documento)
+        return self.gestor_clientes.buscar(documento)
 
-        if cliente is None:
-            log.warning("Cliente no encontrado: %s", documento)
-
-        return cliente
-
-    def actualizar_cliente(self, documento_actual, **datos):
-        # documento_actual identifica al cliente que se va a actualizar.
-        # Los demás campos se envían al gestor de clientes.
-        resultado = self.gestor_clientes.actualizar(
-            documento_actual, **datos
-        )
-
-        if resultado:
-            log.info("Cliente %s actualizado", documento_actual)
-        else:
-            log.warning(
-                "No se pudo actualizar el cliente %s",
-                documento_actual
-            )
-
-        return resultado
+    def actualizar_cliente(self, documento, *args, **kwargs):
+        return self.gestor_clientes.actualizar(documento, *args, **kwargs)
 
     def eliminar_cliente(self, documento):
-        resultado = self.gestor_clientes.eliminar(documento)
-
-        if resultado:
-            log.info("Cliente %s eliminado", documento)
-        else:
-            log.warning("No se pudo eliminar el cliente %s", documento)
-
-        return resultado
+        return self.gestor_clientes.eliminar(documento)
 
     def listar_clientes(self):
         return self.gestor_clientes.listar()
 
-    # Métodos provisionales hasta conocer la interfaz de servicios.py.
-    def agregar_servicio(self, servicio):
-        if servicio is None:
-            raise ValueError("El servicio no puede estar vacío")
-
-        self.servicios.append(servicio)
-        log.info("Objeto de servicio agregado")
-        return True
-
     def listar_servicios(self):
-        return list(self.servicios)
+        return list(self.servicios.values())
 
-    # Métodos provisionales hasta conocer la interfaz de reservas.py.
-    def agregar_reserva(self, reserva):
+    def crear_reserva(self, id_reserva, documento_cliente, id_servicio):
+        cliente = self.buscar_cliente(documento_cliente)
+        servicio = self.servicios.get(id_servicio)
+        if cliente is None:
+            raise DatosInvalidosError("No se encontró el cliente indicado.")
+        if servicio is None:
+            raise DatosInvalidosError("No se encontró el servicio indicado.")
+        return self.gestor_reservas.crear_reserva(id_reserva, cliente, servicio)
+
+    def confirmar_reserva(self, id_reserva):
+        reserva = self.gestor_reservas.buscar(id_reserva)
         if reserva is None:
-            raise ValueError("La reserva no puede estar vacía")
+            raise ReservaError("No se encontró la reserva.")
+        return reserva.confirmar()
 
-        self.reservas.append(reserva)
-        log.info("Objeto de reserva agregado")
-        return True
+    def cancelar_reserva(self, id_reserva):
+        reserva = self.gestor_reservas.buscar(id_reserva)
+        if reserva is None:
+            raise ReservaError("No se encontró la reserva.")
+        return reserva.cancelar()
 
     def listar_reservas(self):
-        return list(self.reservas)
+        return self.gestor_reservas.listar()
 
     def mostrar_resumen(self):
-        print("\n========== SOFTWARE FJ ==========")
-        print("Clientes:", len(self.listar_clientes()))
-        print("Servicios cargados:", len(self.listar_servicios()))
-        print("Reservas cargadas:", len(self.listar_reservas()))
-        print("=================================")
+        print("\n========== RESUMEN SOFTWARE FJ ==========")
+        print("Clientes registrados:", len(self.listar_clientes()))
+        print("Servicios disponibles:", len(self.listar_servicios()))
+        print("Reservas registradas:", len(self.listar_reservas()))
+        print("=========================================")
